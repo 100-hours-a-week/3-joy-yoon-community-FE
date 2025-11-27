@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 
@@ -11,6 +12,18 @@ const port = 3000;
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+    session({
+        secret: 'community',
+        saveUninitialized: true,
+        resave: false,
+        cookie:{
+            secret:false,
+            maxAge: 24 * 60 * 60 * 1000, // 쿠키 유효 시간 (1일)
+        },
+    }),
+);
 
 // 라우터 등록
 app.use('/auth', authRoutes);

@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordConfirmError = document.getElementById('passwordConfirmError');
   const nicknameError = document.getElementById('nicknameError');
   const helper = document.getElementById('profileHelper');
+  const API_BASE_URL = CONFIG.API_BASE_URL;
+
 
   let uploaded = false;
   let base64Image = null;
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const resp = await fetch(`http://localhost:8080/api/v1/auth/check-email?email=${encodeURIComponent(value)}`);
+      const resp = await fetch(`${API_BASE_URL}/auth/check-email?email=${encodeURIComponent(value)}`);
       const data = await resp.json();
       if (resp.ok && data.available === false) {
         emailError.textContent = '* 중복된 이메일입니다.';
@@ -136,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const resp = await fetch(`http://localhost:8080/api/v1/auth/check-nickname?nickname=${encodeURIComponent(value)}`);
+      const resp = await fetch(`${API_BASE_URL}/auth/check-nickname?nickname=${encodeURIComponent(value)}`);
       const data = await resp.json();
       if (resp.ok && data.available === false) {
         nicknameError.textContent = '* 중복된 닉네임입니다.';
@@ -163,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         image: base64Image || null
       };
 
-      const resp = await fetch('http://localhost:8080/api/v1/auth', {
+      const resp = await fetch('${API_BASE_URL}/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

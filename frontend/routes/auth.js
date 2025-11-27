@@ -2,18 +2,15 @@ const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
 const { setAccessToken } = require('../utils/tokenStore');
-// const API_BASE_URL = 'http://localhost:8080/api/v1';
-const API_BASE_URL = CONFIG.API_BASE_URL;
+const API_BASE_URL = 'http://localhost:8080/api/v1';
+// const API_BASE_URL = CONFIG.API_BASE_URL;
 
 // 로그아웃
 // const { clearAccessToken } = require('../utils/tokenStore');
 
 router.post('/login', async (req, res) => {
-    console.log('[로그인 성공, 토큰 저장]', data.accessToken);
-    try {
-        console.log("router 창인가 아닌가")
         const { email, password } = req.body;
-
+  try {
         // Spring boot 로그인 API 호출
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
