@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: ${DOCKER_IMAGE_NAME}:${TAG}
+    build: .
+    container_name: community-fe
+    env_file:
+      - .env
+    ports:
+      - "${PORTS}:${PORTS}"
+    volumes:
+      - /home/community-fe/3-joy-yoon-community-FE/frontend:/app
+    restart: always
+    networks:
+      - community_net
+
+networks:
+  community_net:
+    driver: bridge

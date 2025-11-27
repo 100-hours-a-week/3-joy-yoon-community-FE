@@ -1,0 +1,41 @@
+# Node.js 기반 이미지 (가볍고 안정적인 alpine 사용)
+# FROM node:20-alpine
+FROM node:20
+USER root
+
+# Variables
+ARG USERNAME=community-fe
+ARG USER_UID=1001
+ARG USER_GID=$USER_UID
+
+# 사용자/그룹 추가
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# 의존성 파일만 먼저 복사
+COPY package*.json ./
+
+# 프로덕션용 의존성 설치
+RUN npm install --omit=dev
+
+# 나머지 앱 코드 복사
+COPY . .
+
+# 환경 변수 (필요하면 나중에 덮어쓸 수 있음)
+ENV NODE_ENV=production
+
+# 사용자 변경 및 컨테이너 내 작업 디렉토리
+USER community-fe
+WORKDIR /app
+
+# Express 서버 포트 (app.js에서 쓰는 포트와 맞춰야 함, 보통 3000)
+EXPOSE 3000
+
+# 컨테이너 시작 시 실행할 명령
+# - package.json 안에 "start": "node app.js" 가 있다고 가정
+# CMD ["npm", "start"]
+CMD ["node", "app.js"]

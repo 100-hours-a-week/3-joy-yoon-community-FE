@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
 const { setAccessToken } = require('../utils/tokenStore');
-// const API_BASE_URL = 'http://localhost:8080/api/v1';
-const API_BASE_URL = CONFIG.API_BASE_URL;
+const API_BASE_URL = 'http://localhost:8080/api/v1';
+// const API_BASE_URL = CONFIG.API_BASE_URL;
 
 // 로그아웃
 // const { clearAccessToken } = require('../utils/tokenStore');
