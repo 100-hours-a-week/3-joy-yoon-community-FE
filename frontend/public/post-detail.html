@@ -1,67 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>게시글 상세</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 상세 - CommuKnit</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <header>
-        <h1>아무 말 대잔치</h1>
-    </header>
+    <div id="header-placeholder"></div>
 
-    <div class="container">
+    <main class="fade-in">
         <div class="post-detail">
             <!-- 게시글 헤더 -->
             <div class="post-header">
                 <button class="btn-back" id="btnBack">← 목록으로</button>
-                <div class="post-actions">
-                    <button class="btn-edit" id="btnEdit">수정</button>
-                    <button class="btn-delete" id="btnDelete">삭제</button>
+                <div class="post-actions" id="postActions">
+                    <!-- 작성자인 경우에만 수정/삭제 버튼 표시 -->
                 </div>
             </div>
 
             <!-- 게시글 내용 -->
             <div class="post-content">
-                <h2 class="post-title" id="postTitle"></h2>
+                <h1 class="post-title" id="postTitle"></h1>
                 <div class="post-meta">
                     <span class="post-author" id="postAuthor"></span>
                     <span class="post-date" id="postDate"></span>
                 </div>
-                <div class="post-body" id="postBody"></div>
                 <div class="post-stats">
-                    <span>조회수 <strong id="postViews">0</strong></span>
-                    <span>댓글 <strong id="postComments">0</strong></span>
+                    <span>👁️ 조회수 <strong id="postViews">0</strong></span>
+                    <span>💬 댓글 <strong id="postComments">0</strong></span>
                 </div>
+                <div class="post-body" id="postBody"></div>
                 <div class="post-image" id="postImage"></div>
             </div>
 
             <!-- 좋아요 버튼 -->
             <div class="like-section">
-                <!-- <button class="btn-like" id="btnLike">
-                    조회수<span class="view-count" id="viewCount">0</span>
-                </button> -->
                 <button class="btn-like" id="btnLike">
-                    <span class="like-icon">♥</span>
-                <span class="like-count" id="likeCount">0</span>
+                    <span class="like-icon">🧡</span>
+                    <span class="like-count" id="likeCount">0</span>
                 </button>
-                <!-- <button class="btn-like" id="btnLike">
-                댓글수<span class="comment-count" id="commentCount">0</span>
-                </button> -->
             </div>
 
             <!-- 댓글 섹션 -->
             <div class="comment-section">
-                <h3 class="comment-title">댓글</h3>
+                <h3 class="comment-title">💬 댓글</h3>
                 
                 <!-- 댓글 입력 -->
                 <div class="comment-input-wrapper">
                     <textarea 
                         id="commentInput" 
-                        placeholder="댓글을 남겨주세요" 
+                        placeholder="따뜻한 댓글을 남겨주세요 🧶" 
                         rows="3"
                     ></textarea>
                     <button class="btn-comment-submit" id="btnCommentSubmit" disabled>
@@ -75,7 +67,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- 삭제 확인 모달 -->
     <div class="modal-overlay" id="modalOverlay">
@@ -89,13 +81,11 @@
         </div>
     </div>
 
-    <footer>
-        © 2025 My Community —
-        <a href="http://localhost:8080/service">이용약관</a> ·
-        <a href="http://localhost:8080/privacy">개인정보처리방침</a>
-    </footer>
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/config.js"></script>
+    <script src="/js/layout.js"></script>
     <script src="/js/post-detail.js"></script>
 </body>
-
 </html>

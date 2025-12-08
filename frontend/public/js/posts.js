@@ -3,9 +3,10 @@ async function loadPosts() {
   container.innerHTML = '<p>게시글을 불러오는 중...</p>';
 
   try {
-    const resp = await fetch('/api/v1/posts');
-    if (!resp.ok) throw new Error('게시글 불러오기 실패');
-    const posts = await resp.json();
+    const resp = await axios.get('/api/v1/posts', {
+      withCredentials: true
+    });
+    const posts = resp.data;
 
     if (posts.length === 0) {
       container.innerHTML = '<p>게시글이 없습니다.</p>';

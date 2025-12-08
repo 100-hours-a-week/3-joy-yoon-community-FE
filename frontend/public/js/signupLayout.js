@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const pageEl = document.getElementById("page-content");
   const pageHTML = pageEl ? pageEl.innerHTML : "";
 
-  fetch("/layout.html")
-    .then(res => res.text())
+  axios.get("/layout.html")
+    .then(res => res.data)
     .then(layout => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(layout, "text/html");

@@ -1,55 +1,65 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>커뮤니티</title>
-  <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommuKnit - 뜨개질 커뮤니티</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <header>
-    <h1>아무 말 대잔치</h1>
-  </header>
+    <div id="header-placeholder"></div>
 
-  <div class="container">
-    <!-- 페이지별 본문이 여기에 들어감 -->
-    <div id="content"></div>
-  </div>
+    <main class="form-wrap fade-in" style="min-height: calc(100vh - 200px);">
+        <div style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 4rem; margin-bottom: 16px;">🧶</div>
+            <h1 style="font-family: 'Gowun Batang', serif; font-size: 2.5rem; margin-bottom: 16px; color: var(--color-yarn-coral);">
+                CommuKnit
+            </h1>
+            <p style="font-size: 1.125rem; color: var(--color-text-secondary); margin-bottom: 8px;">
+                뜨개질을 사랑하는 사람들이 모인 따뜻한 공간
+            </p>
+            <p style="font-size: 1rem; color: var(--color-text-muted); margin-bottom: 40px; line-height: 1.7;">
+                패턴을 공유하고, 작품을 자랑하고,<br>
+                함께 뜨개질의 즐거움을 나눠보세요! 🧵
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <a href="/login" class="btn" style="width: auto; min-width: 160px;">로그인</a>
+                <a href="/signup" class="btn btn-secondary" style="width: auto; min-width: 160px;">회원가입</a>
+            </div>
+            
+            <!-- 장식 요소 -->
+            <div style="margin-top: 60px; display: flex; justify-content: center; gap: 24px; opacity: 0.3;">
+                <span style="font-size: 2rem;">🧶</span>
+                <span style="font-size: 2rem;">🪡</span>
+                <span style="font-size: 2rem;">🧵</span>
+                <span style="font-size: 2rem;">🎀</span>
+                <span style="font-size: 2rem;">🧣</span>
+            </div>
+        </div>
+    </main>
 
-  <footer>
-    © 2025 My Community —
-    <a href="http://localhost:8080/service">이용약관 index</a> ·
-    <a href="http://localhost:8080/privacy">개인정보처리방침</a>
-  </footer>
+    <div id="footer-placeholder"></div>
 
-  <script>
-    // layout.html 공통 스크립트
-    // URL path에 따라 자동으로 해당 HTML 본문 로드
-    document.addEventListener("DOMContentLoaded", async () => {
-      const path = window.location.pathname;
-      let page = "";
-
-      if (path === "/signup") {
-        page = "/signup.html";
-      } else if (path === "/login") {
-        page = "/login.html";
-      } else if (path === "/profile-modify") {
-        page = "/profile-modify.html";
-      } else if (path === "/change-password") {
-        page = "/change-password.html";
-      } else if (path === "/post-create") {
-        page = "/post-create.html";
-      } else {
-        page = "/partials/404.html"; // 기본값
-      }
-
-      const res = await fetch(page);
-      const html = await res.text();
-      document.getElementById("content").innerHTML = html;
-    });
-  </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/layout.js"></script>
+    <script>
+        // 이미 로그인된 사용자는 게시글 목록으로 이동
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await axios.get('/auth/me', {
+                    withCredentials: true
+                });
+                if (res.data.isLoggedIn) {
+                    window.location.href = '/post-list';
+                }
+            } catch (e) {
+                // 에러 무시
+            }
+        });
+    </script>
 </body>
-
 </html>

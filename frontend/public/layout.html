@@ -1,24 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>커뮤니티 레이아웃</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아무 말 대잔치</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <header>
-        <h1>아무 말 대잔치</h1>
-    </header>
+    <!-- 
+        공통 레이아웃 템플릿
+        이 파일은 레이아웃의 기본 구조를 보여주는 참조용입니다.
+        실제 페이지들은 layout.js를 통해 동적으로 header와 footer를 로드합니다.
+    -->
+    
+    <div id="header-placeholder"></div>
 
-    <div class="container">
-    </div>
+    <main class="container">
+        <!-- 페이지별 콘텐츠가 여기에 들어갑니다 -->
+        <div id="content"></div>
+    </main>
 
-    <footer>
-        © 2025 My Community — <a href="#">이용약관</a> · <a href="#">개인정보처리방침</a>
-    </footer>
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/layout.js"></script>
 </body>
-
 </html>

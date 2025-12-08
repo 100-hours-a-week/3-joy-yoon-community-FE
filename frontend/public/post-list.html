@@ -1,37 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>게시글 목록</title>
-  <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 목록 - CommuKnit</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <header>
-    <h1>아무 말 대잔치</h1>
-  </header>
-  <h2 class="page-title">안녕하세요,</br>아무 말 대잔치 게시판 입니다.</h2>
-  <div class="post-container">
-    <button class="btn-write" id="btnWrite">게시글 작성</button>
+    <div id="header-placeholder"></div>
 
-    <div class="post-list" id="postList">
-      <!-- 게시글 카드들이 여기에 동적으로 추가됩니다 -->
-    </div>
+    <main class="fade-in">
+        <h2 class="page-title">환영합니다!<br>뜨개질 이야기를 나눠보세요</h2>
+        
+        <div class="post-container">
+            <button class="btn-write" id="btnWrite">게시글 작성</button>
 
-    <div class="loading" id="loading" style="display: none;">
-      로딩 중...
-    </div>
-  </div>
+            <div class="post-list" id="postList">
+                <!-- 게시글 카드들이 여기에 동적으로 추가됩니다 -->
+            </div>
 
-  <footer>
-    © 2025 My Community —
-    <a href="http://localhost:8080/service">이용약관</a> ·
-    <a href="http://localhost:8080/privacy">개인정보처리방침</a>
-  </footer>
-  <script src="/js/config.js"></script>
-  <script src="/js/post-list.js"></script>
+            <div class="loading" id="loading" style="display: none;">
+                실을 감는 중...
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/layout.js"></script>
+    <script src="/js/post-list.js"></script>
 </body>
-
 </html>

@@ -26,9 +26,10 @@ async function includeHTML(selector, fileName) {
   }
 
   try {
-    const response = await fetch(filePath, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const html = await response.text();
+    const response = await axios.get(filePath, {
+      headers: { 'Cache-Control': 'no-store' }
+    });
+    const html = response.data;
 
     element.innerHTML = html;
     localStorage.setItem(cacheKey, html); // 캐시 저장

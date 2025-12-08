@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let isLoading = false;
   let hasMore = true;
 
-  const API_BASE_URL = CONFIG.API_BASE_URL;
+  // Express 서버의 /boards 엔드포인트 사용 (세션을 통한 인증 처리)
+  const POSTS_API_URL = '/boards';
 
   // 게시글 작성 버튼
   btnWrite.addEventListener('click', () => {
@@ -39,6 +40,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  // 프로필 이미지 HTML 생성 함수
+  function createProfileImageHtml(authorName, profileImage) {
+    if (profileImage) {
+      return `<img src="${profileImage}" alt="${authorName}" class="author-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    }
+    return '';
+  }
+
+  // 기본 아바타 HTML 생성 함수
+  function createDefaultAvatarHtml(authorName) {
+    const initial = (authorName || 'U').charAt(0).toUpperCase();
+    return `<span class="author-avatar-initial">${initial}</span>`;
+  }
+
   // 게시글 카드 생성
   function createPostCard(post) {
     const card = document.createElement('div');
@@ -49,6 +64,101 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayTitle = post.title.length > 26 
       ? post.title.substring(0, 26) 
       : post.title;
+
+    // 작성자 프로필 이미지 가져오기 (게시글 상세와 동일한 로직)
+    const authorName = post.author || post.authorNickname || post.nickname || '익명';
+    
+    // 프로필 이미지 찾기 (다양한 경로 탐색 - 게시글 상세와 동일)
+    // 빈 문자열, null, 'null', undefined는 제외
+    let authorProfileImage = null;
+    
+    // 유효한 이미지 값인지 확인하는 헬퍼 함수
+    const isValidImage = (img) => {
+      return img && img !== null && img !== 'null' && img !== '' && img !== undefined && img.trim() !== '';
+    };
+    
+    // 직접 필드 확인 (더 많은 필드명 확인)
+    if (isValidImage(post.authorProfileImage)) authorProfileImage = post.authorProfileImage;
+    else if (isValidImage(post.profileImage)) authorProfileImage = post.profileImage;
+    else if (isValidImage(post.image)) authorProfileImage = post.image;
+    else if (isValidImage(post.authorImage)) authorProfileImage = post.authorImage;
+    else if (isValidImage(post.userImage)) authorProfileImage = post.userImage;
+    else if (isValidImage(post.userProfileImage)) authorProfileImage = post.userProfileImage;
+    
+    // user 객체 내부 확인 (더 깊이 탐색)
+    if (!authorProfileImage && post.user) {
+      if (isValidImage(post.user.image)) authorProfileImage = post.user.image;
+      else if (isValidImage(post.user.profileImage)) authorProfileImage = post.user.profileImage;
+      else if (isValidImage(post.user.authorImage)) authorProfileImage = post.user.authorImage;
+      else if (isValidImage(post.user.userImage)) authorProfileImage = post.user.userImage;
+      else if (isValidImage(post.user.userProfileImage)) authorProfileImage = post.user.userProfileImage;
+    }
+    
+    // authorObj 객체 내부 확인
+    if (!authorProfileImage && post.authorObj) {
+      if (isValidImage(post.authorObj.image)) authorProfileImage = post.authorObj.image;
+      else if (isValidImage(post.authorObj.profileImage)) authorProfileImage = post.authorObj.profileImage;
+      else if (isValidImage(post.authorObj.userImage)) authorProfileImage = post.authorObj.userImage;
+      else if (isValidImage(post.authorObj.userProfileImage)) authorProfileImage = post.authorObj.userProfileImage;
+    }
+    
+    // author 객체 내부 확인 (authorObj와 별도)
+    if (!authorProfileImage && post.author) {
+      if (typeof post.author === 'object' && post.author !== null) {
+        if (isValidImage(post.author.image)) authorProfileImage = post.author.image;
+        else if (isValidImage(post.author.profileImage)) authorProfileImage = post.author.profileImage;
+        else if (isValidImage(post.author.userImage)) authorProfileImage = post.author.userImage;
+      }
+    }
+    
+    // 모든 필드를 순회하며 이미지 찾기 (마지막 수단)
+    if (!authorProfileImage) {
+      const allKeys = Object.keys(post);
+      for (const key of allKeys) {
+        if (key.toLowerCase().includes('image') || key.toLowerCase().includes('profile')) {
+          const value = post[key];
+          if (isValidImage(value)) {
+            authorProfileImage = value;
+            console.log('게시글 목록 - 프로필 이미지 발견 (동적 필드):', key, value.substring(0, 50) + '...');
+            break;
+          }
+        }
+      }
+    }
+    
+    // 디버깅: 프로필 이미지 찾기 실패 시 로그 (첫 번째 게시글만)
+    if (!authorProfileImage) {
+      const imageRelatedKeys = Object.keys(post).filter(key => 
+        key.toLowerCase().includes('image') || 
+        key.toLowerCase().includes('profile') ||
+        key.toLowerCase().includes('avatar') ||
+        key.toLowerCase().includes('user') ||
+        key.toLowerCase().includes('author')
+      );
+      console.log('게시글 목록 - 프로필 이미지 없음:', {
+        postId: post.id || post.postId,
+        author: authorName,
+        hasUser: !!post.user,
+        hasAuthorObj: !!post.authorObj,
+        hasAuthor: !!post.author,
+        userKeys: post.user ? Object.keys(post.user) : null,
+        authorObjKeys: post.authorObj ? Object.keys(post.authorObj) : null,
+        authorKeys: (typeof post.author === 'object' && post.author !== null) ? Object.keys(post.author) : null,
+        imageRelatedKeys: imageRelatedKeys,
+        전체키: Object.keys(post),
+        전체데이터: post
+      });
+    } else {
+      console.log('게시글 목록 - 프로필 이미지 찾음:', {
+        postId: post.id || post.postId,
+        author: authorName,
+        imageSource: authorProfileImage.substring(0, 50) + '...'
+      });
+    }
+
+    // 프로필 이미지 HTML 생성
+    const profileImageHtml = createProfileImageHtml(authorName, authorProfileImage);
+    const defaultAvatarHtml = createDefaultAvatarHtml(authorName);
 
     card.innerHTML = `
       <div class="post-card-header">
@@ -61,13 +171,19 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         </div>
         <div class="post-stats">
-        <span class="post-author">${post.author}</span>
+          <div class="post-author-info">
+            <div class="author-avatar">
+              ${profileImageHtml}
+              ${defaultAvatarHtml}
+            </div>
+            <span class="post-author">${authorName}</span>
+          </div>
       </div>
     `;
 
     // 카드 클릭 시 상세 페이지로 이동
     card.addEventListener('click', () => {
-      window.location.href = `/post-detail.html?id=${post.id}`;
+      window.location.href = `/post-detail?id=${post.id}`;
     });
 
     return card;
@@ -80,22 +196,17 @@ document.addEventListener('DOMContentLoaded', () => {
     isLoading = true;
     loading.style.display = 'block';
 
-    const url = `${API_BASE_URL}/boards?page=${currentPage}&size=10`;
-    // const url = `${API_BASE_URL}/boards`;
+    const url = `${POSTS_API_URL}?page=${currentPage}&size=10`;
     console.log('요청 URL:', url);
 
     try {
-      const response = await fetch(url);
+      const response = await axios.get(url, {
+        withCredentials: true // 쿠키(세션) 전송을 위해 필요
+      });
       
       console.log('응답 상태:', response.status);
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('에러 응답:', errorText);
-        throw new Error(`게시글을 불러오는데 실패했습니다. (status: ${response.status})`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       console.log('받은 데이터:', data);
       
       // Spring Data JPA의 Page 객체 구조
@@ -111,7 +222,24 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // 게시글 카드 추가
-      posts.forEach(post => {
+      posts.forEach((post, index) => {
+        // 첫 번째 게시글의 데이터 구조 확인 (디버깅)
+        if (index === 0) {
+          console.log('=== 게시글 목록 첫 번째 게시글 데이터 ===');
+          console.log('전체 데이터:', post);
+          console.log('모든 키:', Object.keys(post));
+          if (post.user) {
+            console.log('user 객체:', post.user);
+            console.log('user 객체의 키:', Object.keys(post.user));
+          }
+          // 프로필 이미지 관련 필드 찾기
+          const imageFields = Object.keys(post).filter(key => 
+            key.toLowerCase().includes('image') || 
+            key.toLowerCase().includes('profile') ||
+            key.toLowerCase().includes('avatar')
+          );
+          console.log('이미지 관련 필드:', imageFields);
+        }
         const card = createPostCard(post);
         postList.appendChild(card);
       });

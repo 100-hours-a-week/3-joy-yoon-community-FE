@@ -1,63 +1,116 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>커뮤니티</title>
-  <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - CommuKnit</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <header>
-    <h1>아무 말 대잔치</h1>
-  </header>
-  <div class="login-wrap">
-    <h1 class="signup-title">회원가입</h1>
-    <main class="card">
-      <form id="signupForm">
-        <label for="profileImage">프로필 사진</label>
-        <p class="helper-text" id="profileHelper">프로필 사진을 추가해주세요.</p>
-        <div class="profile-upload">
-          <input type="file" id="profileImage" accept="image/*" hidden />
-          <div class="profile-circle" id="profilePreview">
-            <span class="plus-icon">+</span>
-          </div>
+    <div id="header-placeholder"></div>
+
+    <main class="form-wrap fade-in">
+        <h2 class="form-title">회원가입</h2>
+        
+        <div class="card">
+            <form id="signupForm">
+                <!-- 프로필 이미지 업로드 -->
+                <div class="form-group">
+                    <label>프로필 사진 (선택)</label>
+                    <p id="profileHelper" style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 8px;">
+                        프로필 사진을 추가해주세요.
+                    </p>
+                    <div class="profile-upload">
+                        <input type="file" id="profileImage" accept="image/*" hidden>
+                        <div class="profile-circle" id="profilePreview">
+                            <span class="plus-icon">+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 이메일 -->
+                <div class="form-group">
+                    <label for="email">이메일 *</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="example@email.com" 
+                        required
+                        autocomplete="email"
+                    >
+                    <p class="helper-text" id="emailError" style="display: block; color: var(--color-text-muted);">
+                        이메일을 입력해주세요.
+                    </p>
+                </div>
+
+                <!-- 비밀번호 -->
+                <div class="form-group">
+                    <label for="password">비밀번호 *</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="비밀번호를 입력하세요" 
+                        required
+                        autocomplete="new-password"
+                    >
+                    <p class="helper-text" id="passwordError" style="display: block; color: var(--color-text-muted);">
+                        8~20자, 대/소문자, 숫자, 특수문자 포함
+                    </p>
+                </div>
+
+                <!-- 비밀번호 확인 -->
+                <div class="form-group">
+                    <label for="passwordConfirm">비밀번호 확인 *</label>
+                    <input 
+                        type="password" 
+                        id="passwordConfirm" 
+                        name="passwordConfirm" 
+                        placeholder="비밀번호를 한번 더 입력하세요" 
+                        required
+                        autocomplete="new-password"
+                    >
+                    <p class="helper-text" id="passwordConfirmError" style="display: block; color: var(--color-text-muted);">
+                        비밀번호를 다시 입력해주세요.
+                    </p>
+                </div>
+
+                <!-- 닉네임 -->
+                <div class="form-group">
+                    <label for="nickname">닉네임 *</label>
+                    <input 
+                        type="text" 
+                        id="nickname" 
+                        name="nickname" 
+                        placeholder="닉네임을 입력하세요" 
+                        required
+                        autocomplete="nickname"
+                        maxlength="10"
+                    >
+                    <p class="helper-text" id="nicknameError" style="display: block; color: var(--color-text-muted);">
+                        2~10자, 공백 없이 입력해주세요.
+                    </p>
+                </div>
+
+                <button type="submit" class="btn" disabled>회원가입</button>
+                <p id="submitMsg" class="helper-text text-center mt-md"></p>
+            </form>
+            
+            <div class="link">
+                <a href="/login">로그인하러 가기</a>
+            </div>
         </div>
-
-        <label for="email">이메일 *</label>
-        <input id="email" name="email" type="email" placeholder="이메일을 입력하세요" required />
-        <p class="helper-text" id="emailError"></p>
-
-        <label for="password">비밀번호 *</label>
-        <input id="password" name="password" type="password" placeholder="비밀번호를 입력하세요" required />
-        <p class="helper-text" id="passwordError"></p>
-
-        <label for="passwordConfirm">비밀번호 확인 *</label>
-        <input id="passwordConfirm" name="passwordConfirm" type="password" placeholder="비밀번호를 한번 더 입력하세요" required />
-        <p class="helper-text" id="passwordConfirmError"></p>
-
-        <label for="nickname">닉네임 *</label>
-        <input id="nickname" name="nickname" type="text" placeholder="닉네임을 입력하세요" required />
-        <p class="helper-text" id="nicknameError"></p>
-
-        <button class="btn" type="submit">회원가입</button>
-        <p id="submitMsg" class="helper-text" style="text-align:center; margin-top:8px;"></p>
-      </form>
-
-      <div class="link">
-        <a href="/login">로그인하러 가기</a>
-      </div>
     </main>
-  </div>
 
-  <footer>
-    © 2025 My Community —
-    <a href="http://localhost:8080/service">이용약관 index</a> ·
-    <a href="http://localhost:8080/privacy">개인정보처리방침</a>
-  </footer>
-  <script src="/js/config.js"></script>
-  <script src="/js/signup.js"></script>
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/layout.js"></script>
+    <script src="/js/signup.js"></script>
 </body>
-
 </html>

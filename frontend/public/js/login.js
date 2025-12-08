@@ -4,7 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const pwInput = document.getElementById('password');
   const btn = document.querySelector('.btn');
   const loginError = document.getElementById('loginError'); // helper text 영역
-  const API_BASE_URL = CONFIG.API_BASE_URL;
+  // Express 서버의 /auth/login 엔드포인트 사용 (세션 설정을 위해)
+  const LOGIN_API_URL = '/auth/login';
+  
+  // 필수 요소가 없으면 에러 로그 출력 후 종료
+  if (!form || !emailInput || !pwInput) {
+    console.error('로그인 폼 요소를 찾을 수 없습니다.');
+    return;
+  }
   
   // 페이지 진입 시 helper text 초기화
   if (loginError) {
@@ -26,38 +33,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const resp = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
+      const resp = await axios.post(LOGIN_API_URL, {
+        email,
+        password
+      }, {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        withCredentials: true // 쿠키(세션) 전송을 위해 필요
       });
 
-      if (resp.ok) {
-        const data = await resp.json();
+      const data = resp.data;
 
-        // 로그인 성공 시 helper text 숨기기
-        if (loginError) {
-          loginError.textContent = '';
-          loginError.style.display = 'none';
-        }
-
-        alert('로그인 성공! 게시판으로 이동합니다.');
-        window.location.href = '/post-list';
-      } else {
-        // 실패 시 helper text 표시
-        if (loginError) {
-          loginError.textContent = '* 아이디 또는 비밀번호를 확인해주세요';
-          loginError.style.display = 'block';
-          loginError.style.color = '#e53935';
-        }
-      }
-    } catch (err) {
+      // 로그인 성공 시 helper text 숨기기
       if (loginError) {
-        loginError.textContent = '* 서버 오류가 발생했습니다.';
+        loginError.textContent = '';
+        loginError.style.display = 'none';
+      }
+
+      // alert 제거 - 바로 게시판으로 이동
+      window.location.href = '/post-list';
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || '아이디 또는 비밀번호를 확인해주세요';
+      
+      if (loginError) {
+        loginError.textContent = `* ${errorMessage}`;
         loginError.style.display = 'block';
         loginError.style.color = '#e53935';
       }
-      console.error(err);
+      console.error('로그인 실패:', err);
     }
   });
 });
