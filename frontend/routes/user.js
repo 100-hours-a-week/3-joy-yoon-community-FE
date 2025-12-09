@@ -19,6 +19,40 @@ const requireAuth = (req, res, next) => {
     next();
 };
 
+// 사용자 정보 조회 (인증 불필요, 공개 정보만)
+router.get('/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        // 세션에 토큰이 있으면 헤더에 추가
+        const headers = { 'Content-Type': 'application/json' };
+        if (req.session && req.session.accessToken) {
+            headers['Authorization'] = `Bearer ${req.session.accessToken}`;
+        }
+        
+        // 백엔드 API: GET /api/users/{userId}
+        const response = await axios.get(`${API_BASE_URL}/users/${userId}`, {
+            headers
+        });
+
+        const data = response.data;
+        
+        // 공개 정보만 반환 (프로필 이미지, 닉네임 등)
+        res.json({
+            userId: data.userId || data.id,
+            nickname: data.nickname,
+            profileImage: data.image || data.profileImage,
+            image: data.image || data.profileImage
+        });
+    } catch (error) {
+        console.error('사용자 정보 조회 실패:', error);
+        if (error.response) {
+            return res.status(error.response.status).json(error.response.data);
+        }
+        res.status(500).json({ message: '사용자 정보 조회 오류' });
+    }
+});
+
 // 회원정보 수정 (인증 필요)
 router.put('/:userId', requireAuth, async (req, res) => {
     try {

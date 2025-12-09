@@ -231,7 +231,7 @@ router.delete('/:postId', requireAuth, async (req, res) => {
         const clientCookies = req.headers.cookie || '';
         
         const headers = {
-            'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         };
         

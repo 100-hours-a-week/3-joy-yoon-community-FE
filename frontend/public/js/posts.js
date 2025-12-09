@@ -3,7 +3,7 @@ async function loadPosts() {
   container.innerHTML = '<p>게시글을 불러오는 중...</p>';
 
   try {
-    const resp = await axios.get('/api/v1/posts', {
+    const resp = await axios.get('/api/boards', {
       withCredentials: true
     });
     const posts = resp.data;

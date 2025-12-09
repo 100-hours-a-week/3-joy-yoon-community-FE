@@ -7,8 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
   let isLoading = false;
   let hasMore = true;
 
-  // Express 서버의 /boards 엔드포인트 사용 (세션을 통한 인증 처리)
-  const POSTS_API_URL = '/boards';
+  // 백엔드 API로 직접 연결
+  const POSTS_API_URL = window.CONFIG?.API_BASE_URL 
+    ? `${window.CONFIG.API_BASE_URL}/api/boards`
+    : 'http://localhost:8080/api/boards';
+  
+  // 작성자 프로필 이미지 캐시 (userId -> profileImage)
+  const authorProfileCache = new Map();
 
   // 게시글 작성 버튼
   btnWrite.addEventListener('click', () => {
@@ -54,8 +59,46 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<span class="author-avatar-initial">${initial}</span>`;
   }
 
+  // 작성자 프로필 이미지 가져오기 (캐시 사용)
+  async function getAuthorProfileImage(authorId, authorName) {
+    if (!authorId) return null;
+    
+    // 캐시 확인
+    if (authorProfileCache.has(authorId)) {
+      return authorProfileCache.get(authorId);
+    }
+    
+    try {
+      // 프론트엔드 서버를 통해 사용자 정보 조회
+      const response = await axios.get(`/users/${authorId}`, {
+        withCredentials: true
+      });
+      
+      const userData = response.data;
+      // 프로필 이미지 찾기
+      const profileImage = userData.image || userData.profileImage || null;
+      
+      // 유효한 이미지인지 확인
+      const isValidImage = (img) => {
+        return img && img !== null && img !== 'null' && img !== '' && img !== undefined && img.trim() !== '';
+      };
+      
+      const validProfileImage = isValidImage(profileImage) ? profileImage : null;
+      
+      // 캐시에 저장 (null도 저장하여 중복 요청 방지)
+      authorProfileCache.set(authorId, validProfileImage);
+      
+      return validProfileImage;
+    } catch (error) {
+      console.error(`작성자 ${authorId} 프로필 이미지 조회 실패:`, error);
+      // 에러 발생 시 null을 캐시에 저장하여 중복 요청 방지
+      authorProfileCache.set(authorId, null);
+      return null;
+    }
+  }
+
   // 게시글 카드 생성
-  function createPostCard(post) {
+  async function createPostCard(post) {
     const card = document.createElement('div');
     card.className = 'post-card';
     card.dataset.postId = post.id;
@@ -65,8 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ? post.title.substring(0, 26) 
       : post.title;
 
-    // 작성자 프로필 이미지 가져오기 (게시글 상세와 동일한 로직)
+    // 작성자 정보 가져오기
     const authorName = post.author || post.authorNickname || post.nickname || '익명';
+    const authorId = post.authorId || post.userId || post.user?.userId || post.user?.id || null;
     
     // 프로필 이미지 찾기 (다양한 경로 탐색 - 게시글 상세와 동일)
     // 빈 문자열, null, 'null', undefined는 제외
@@ -156,6 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // 백엔드 응답에 프로필 이미지가 없으면 작성자 ID로 조회
+    if (!authorProfileImage && authorId) {
+      authorProfileImage = await getAuthorProfileImage(authorId, authorName);
+    }
+
     // 프로필 이미지 HTML 생성
     const profileImageHtml = createProfileImageHtml(authorName, authorProfileImage);
     const defaultAvatarHtml = createDefaultAvatarHtml(authorName);
@@ -181,6 +230,36 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `;
 
+    // 프로필 이미지가 나중에 로드되면 업데이트
+    if (!authorProfileImage && authorId) {
+      getAuthorProfileImage(authorId, authorName).then(profileImage => {
+        if (profileImage) {
+          const avatarDiv = card.querySelector('.author-avatar');
+          if (avatarDiv) {
+            const img = avatarDiv.querySelector('.author-avatar-img');
+            const initial = avatarDiv.querySelector('.author-avatar-initial');
+            if (img) {
+              img.src = profileImage;
+              img.style.display = 'block';
+              if (initial) initial.style.display = 'none';
+            } else {
+              // 이미지가 없으면 새로 추가
+              const newImg = document.createElement('img');
+              newImg.src = profileImage;
+              newImg.alt = authorName;
+              newImg.className = 'author-avatar-img';
+              newImg.onerror = function() {
+                this.style.display = 'none';
+                if (initial) initial.style.display = 'flex';
+              };
+              if (initial) initial.style.display = 'none';
+              avatarDiv.insertBefore(newImg, initial);
+            }
+          }
+        }
+      });
+    }
+
     // 카드 클릭 시 상세 페이지로 이동
     card.addEventListener('click', () => {
       window.location.href = `/post-detail?id=${post.id}`;
@@ -200,7 +279,17 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('요청 URL:', url);
 
     try {
+      // 인증 토큰 가져오기 (localStorage 또는 세션)
+      const accessToken = localStorage.getItem('accessToken');
+      const headers = {};
+      
+      // 토큰이 있으면 Authorization 헤더에 추가
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+      
       const response = await axios.get(url, {
+        headers,
         withCredentials: true // 쿠키(세션) 전송을 위해 필요
       });
       
@@ -221,8 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 게시글 카드 추가
-      posts.forEach((post, index) => {
+      // 게시글 카드 추가 (비동기 처리)
+      const cardPromises = posts.map(async (post, index) => {
         // 첫 번째 게시글의 데이터 구조 확인 (디버깅)
         if (index === 0) {
           console.log('=== 게시글 목록 첫 번째 게시글 데이터 ===');
@@ -240,7 +329,13 @@ document.addEventListener('DOMContentLoaded', () => {
           );
           console.log('이미지 관련 필드:', imageFields);
         }
-        const card = createPostCard(post);
+        const card = await createPostCard(post);
+        return card;
+      });
+      
+      // 모든 카드가 생성되면 DOM에 추가
+      const cards = await Promise.all(cardPromises);
+      cards.forEach(card => {
         postList.appendChild(card);
       });
 

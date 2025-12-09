@@ -3,63 +3,87 @@ document.addEventListener('DOMContentLoaded', () => {
   const emailInput = document.getElementById('email');
   const pwInput = document.getElementById('password');
   const btn = document.querySelector('.btn');
-  const loginError = document.getElementById('loginError');
+  const loginError = document.getElementById('loginError'); // helper text 영역
   
-  // 프론트엔드 서버의 로그인 API 사용 (세션 생성을 위해)
-  const LOGIN_API_URL = '/auth/login';
-  console.log('로그인 API URL:', LOGIN_API_URL);
+  // 백엔드 API로 직접 연결 (절대 URL 하드코딩)
+  // 브라우저 캐시 문제 방지를 위해 명시적으로 설정
+  const LOGIN_API_URL = 'http://localhost:8080/api/auth/login';
+  console.log('로그인 API URL (하드코딩):', LOGIN_API_URL);
   
+그 출력 후 종료
   if (!form || !emailInput || !pwInput) {
     console.error('로그인 폼 요소를 찾을 수 없습니다.');
     return;
   }
   
+  // 페이지 진입 시 helper text 초기화
   if (loginError) {
     loginError.textContent = '';
     loginError.style.display = 'none';
   }
 
+  // 로그인 요청 처리
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const email = emailInput.value.trim();
     const password = pwInput.value;
 
+    // 기존 에러 메시지 초기화
     if (loginError) {
       loginError.textContent = '';
       loginError.style.display = 'none';
     }
 
     try {
+      // 실제 사용되는 URL 확인
       console.log('로그인 요청 URL:', LOGIN_API_URL);
-      const resp = await axios.post(LOGIN_API_URL, { email, password }, {
+      
+      const resp = await axios.post(LOGIN_API_URL, {
+        email,
+        password
+      }, {
         headers: { 'Content-Type': 'application/json' },
-        withCredentials: true
+        withCredentials: true // 쿠키(세션) 전송을 위해 필요
       });
 
       const data = resp.data;
       console.log('로그인 응답:', data);
 
-      // 로그인 성공 시 accessToken을 localStorage에 저장 (선택사항)
+      // 백엔드에서 받은 accessToken이 있으면 localStorage에 저장
       if (data.accessToken) {
         localStorage.setItem('accessToken', data.accessToken);
+        console.log('Access Token 저장 완료');
       }
 
-      // 에러 메시지 숨기기
+      // 로그인 성공 시 helper text 숨기기
       if (loginError) {
         loginError.textContent = '';
         loginError.style.display = 'none';
       }
 
-      // 게시글 목록 페이지로 리다이렉트
+      // alert 제거 - 바로 게시판으로 이동
       window.location.href = '/post-list';
     } catch (err) {
-      console.error('로그인 실패:', err);
+      console.error('로그인 실패 상세:', err);
+      
       let errorMessage = '아이디 또는 비밀번호를 확인해주세요';
       
+      // 네트워크 에러 (503, 연결 실패 등)
       if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK' || err.response?.status === 503) {
-        errorMessage = '백엔드 서버에 연결할 수 없습니다.';
+        errorMessage = '백엔드 서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.';
+        console.error('백엔드 서버 연결 실패:', {
+          code: err.code,
+          status: err.response?.status,
+          message: err.message,
+          url: LOGIN_API_URL
+        });
       } else if (err.response) {
+        // 서버가 응답했지만 에러 상태
         errorMessage = err.response.data?.message || `서버 오류 (${err.response.status})`;
+      } else if (err.request) {
+        // 요청은 보냈지만 응답을 받지 못함
+        errorMessage = '서버로부터 응답을 받을 수 없습니다.';
       }
       
       if (loginError) {

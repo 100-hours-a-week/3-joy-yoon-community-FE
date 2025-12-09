@@ -213,8 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 이메일 중복 체크 (디바운스 적용)
   const checkEmailDuplicate = debounce(async (value) => {
     try {
-      // Express 서버의 /auth/check-email 엔드포인트 사용
-      const resp = await axios.get(`/auth/check-email?email=${encodeURIComponent(value)}`, {
+      // 백엔드 API로 직접 연결
+      const resp = await axios.get(`http://localhost:8080/api/auth/check-email?email=${encodeURIComponent(value)}`, {
         withCredentials: true // 쿠키 전송
       });
       const data = resp.data;
@@ -357,8 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==== 닉네임 검사 (실시간) ====
   const checkNicknameDuplicate = debounce(async (value) => {
     try {
-      // Express 서버의 /auth/check-nickname 엔드포인트 사용
-      const resp = await axios.get(`/auth/check-nickname?nickname=${encodeURIComponent(value)}`, {
+      // 백엔드 API로 직접 연결
+      const resp = await axios.get(`http://localhost:8080/api/auth/check-nickname?nickname=${encodeURIComponent(value)}`, {
         withCredentials: true // 쿠키 전송
       });
       const data = resp.data;
@@ -451,8 +451,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       console.log('회원가입 요청:', { email: payload.email, nickname: payload.nickname });
 
-      // Express 서버의 /auth/signup 엔드포인트 사용
-      const resp = await axios.post('/auth/signup', payload, {
+      // 백엔드 API로 직접 연결
+      const resp = await axios.post('http://localhost:8080/api/auth/signup', payload, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true
       });

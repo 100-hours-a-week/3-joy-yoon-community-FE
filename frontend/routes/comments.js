@@ -43,6 +43,9 @@ router.get('/:postId', async (req, res) => {
         console.error('댓글 목록 조회 실패:', error);
         if (error.response) {
             return res.status(error.response.status).json(error.response.data);
+        } else if (error.request) {
+            console.error('백엔드 서버에 연결할 수 없습니다.');
+            return res.status(503).json({ message: '백엔드 서버에 연결할 수 없습니다.' });
         }
         res.status(500).json({ message: '댓글 목록 조회 오류' });
     }
@@ -72,6 +75,9 @@ router.post('/:postId', requireAuth, async (req, res) => {
         console.error('댓글 작성 실패:', error);
         if (error.response) {
             return res.status(error.response.status).json(error.response.data);
+        } else if (error.request) {
+            console.error('백엔드 서버에 연결할 수 없습니다.');
+            return res.status(503).json({ message: '백엔드 서버에 연결할 수 없습니다.' });
         }
         res.status(500).json({ message: '댓글 등록 오류' });
     }
@@ -99,6 +105,9 @@ router.put('/:postId/:commentId', requireAuth, async (req, res) => {
         console.error('댓글 수정 실패:', error);
         if (error.response) {
             return res.status(error.response.status).json(error.response.data);
+        } else if (error.request) {
+            console.error('백엔드 서버에 연결할 수 없습니다.');
+            return res.status(503).json({ message: '백엔드 서버에 연결할 수 없습니다.' });
         }
         res.status(500).json({ message: '댓글 수정 오류' });
     }
@@ -129,6 +138,9 @@ router.delete('/:postId/:commentId', requireAuth, async (req, res) => {
                 return res.status(204).send();
             }
             return res.status(error.response.status).json(error.response.data);
+        } else if (error.request) {
+            console.error('백엔드 서버에 연결할 수 없습니다.');
+            return res.status(503).json({ message: '백엔드 서버에 연결할 수 없습니다.' });
         }
         res.status(500).json({ message: '댓글 삭제 오류' });
     }

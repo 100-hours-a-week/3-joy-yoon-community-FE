@@ -3,7 +3,13 @@ const router = express.Router();
 const axios = require('axios');
 const { getAccessToken } = require('../utils/tokenStore');
 
+// 백엔드 API URL - 로컬 개발 환경에서는 localhost 사용
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080/api';
+
+// API_BASE_URL 확인 로그
+console.log('=== 백엔드 API URL 설정 ===');
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('환경 변수 API_BASE_URL:', process.env.API_BASE_URL || '설정되지 않음 (기본값 사용)');
 
 // 로그인
 router.post('/login', async (req, res) => {
@@ -70,7 +76,8 @@ router.post('/login', async (req, res) => {
             }
             console.log('로그인 성공 - 세션 저장 완료');
             return res.json({ 
-                message: '로그인 성공', 
+                message: '로그인 성공',
+                accessToken: accessToken || req.session.accessToken, // accessToken도 응답에 포함
                 user: {
                     userId: req.session.userId,
                     email: req.session.email,
